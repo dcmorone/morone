@@ -5,12 +5,10 @@ from airflow.utils.dates import days_ago
 
 def query_sql_server():
     jdbc_hook = JdbcHook(jdbc_conn_id='my_sql_server')
-    sql = "
-    USE AdventureWorksDW2019;
-    GO
-    SELECT *FROM dbo.DimCustomer
-    GO    
-    "
+    sql = "USE AdventureWorksDW2019"
+    sql = "GO"
+    sql = "SELECT *FROM dbo.DimCustomer"
+    sql = "GO"
     results = jdbc_hook.get_records(sql)
     for result in results:
         print(result)
