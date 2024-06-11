@@ -5,7 +5,7 @@ from airflow.utils.dates import days_ago
 
 def query_sql_server():
     jdbc_hook = JdbcHook(jdbc_conn_id='my_sql_server')
-    sql = "SELECT * FROM your_table"
+    sql = "SELECT TOP (1000) [EmployeeKey]"
     results = jdbc_hook.get_records(sql)
     for result in results:
         print(result)
