@@ -16,7 +16,7 @@ dag = DAG(
 query_task = JdbcOperator(
     task_id='execute_query',
     jdbc_conn_id='my_sqlserver_connection',
-    sql='SELECT TOP 10 * FROM DimCustomer',  # Substitua 'employees' pelo nome da sua tabela
+    sql='SELECT TOP 10 * FROM dbo.DimCustomer',  # Substitua 'employees' pelo nome da sua tabela
     dag=dag,
 )
 
