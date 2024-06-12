@@ -38,7 +38,3 @@ t1 = PythonOperator(
 )
 
 t1
-
-    # Close the connection
-    cursor.close()
-    db_conn.close()
