@@ -1,8 +1,8 @@
-import pyodbc
-from airflow.hooks.base_hook import BaseHook
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
+import pyodbc
+from airflow.hooks.base_hook import BaseHook
 
 def mssql_callable():
     # Fetch the connection information from Airflow's connection manager
