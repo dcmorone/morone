@@ -1,21 +1,6 @@
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
-from airflow.hooks.base_hook import BaseHook
-import pyodbc
+from airflow.providers.jdbc.operators.jdbc import JdbcOperator
 from airflow.utils.dates import days_ago
-
-def execute_query():
-    conn = BaseHook.get_connection('my_sqlserver_connection')  # Substitua 'my_sqlserver_connection' pelo ID da sua conexão
-    conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={conn.host};DATABASE={conn.schema};UID={conn.login};PWD={conn.password}"
-    
-    connection = pyodbc.connect(conn_str)
-    cursor = connection.cursor()
-    cursor.execute("SELECT TOP 10 * FROM DimCustomer")  # Substitua 'your_table' pelo nome da sua tabela
-    rows = cursor.fetchall()
-    for row in rows:
-        print(row)
-    cursor.close()
-    connection.close()
 
 default_args = {
     'owner': 'airflow',
@@ -23,13 +8,16 @@ default_args = {
 }
 
 dag = DAG(
-    'sqlserver_query_dag',
+    'sqlserver_jdbc_query_dag',
     default_args=default_args,
     schedule_interval='@daily',
 )
 
-query_task = PythonOperator(
+query_task = JdbcOperator(
     task_id='execute_query',
-    python_callable=execute_query,
+    jdbc_conn_id='my_sqlserver_connection',
+    sql='SELECT TOP 10 * FROM DimCustomer',  # Substitua 'employees' pelo nome da sua tabela
     dag=dag,
 )
+
+query_task
