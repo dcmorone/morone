@@ -5,12 +5,12 @@ import pyodbc
 from airflow.utils.dates import days_ago
 
 def execute_query():
-    conn = BaseHook.get_connection('my_sqlserver_connection')
+    conn = BaseHook.get_connection('my_sqlserver_connection')  # Substitua 'my_sqlserver_connection' pelo ID da sua conexão
     conn_str = f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={conn.host};DATABASE={conn.schema};UID={conn.login};PWD={conn.password}"
     
     connection = pyodbc.connect(conn_str)
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM INFORMATION_SCHEMA.TABLES;")
+    cursor.execute("SELECT TOP 10 * FROM DimCustomer")  # Substitua 'your_table' pelo nome da sua tabela
     rows = cursor.fetchall()
     for row in rows:
         print(row)
