@@ -1,49 +1,44 @@
+import pyodbc
+from airflow.hooks.base_hook import BaseHook
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.operators.python_operator import PythonOperator
 from datetime import datetime, timedelta
-from airflow.providers.microsoft.mssql.operators.mssql import MsSqlOperator
 
-default_args = {
-    "owner": "airflow",
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "email": "admin@localhost.com",
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5)
-}
-
-def initialize_etl():
-    import pymssql
-    conn = pymssql.connect(server="servername",
-                                user="sa", 
-                                password="r2d2c3po*", 
-                                database="AdventureWorksDW2019",
-                                port=1433)
-    cursor = conn.cursor()
-    cursor.execute ("SELECT @@VERSION")
-    row = cursor.fetchone()
-    print(f"\n\nSERVER VERSION:\n\n{row[0]}")
-    cursor.close()
-    conn.close()
-   
-with DAG(
-        dag_id="my_sqlserver_connection",
-        start_date=datetime(2021, 7, 1),
-        schedule_interval=None,
-        default_args=default_args,
-        catchup=False
-) as dag:
-
-    mssql_select = MsSqlOperator(
-         task_id='mssql_select',
-         mssql_conn_id='mssql_conn',
-         sql=f"SELECT CAST( GETDATE() AS Date );",            
-         autocommit=False,
-         database='AdventureWorksDW2019'
-     )
-
-    initialize = PythonOperator(
-        task_id='initialize_etl_mssql',
-        python_callable=initialize_etl
+def mssql_callable():
+    # Fetch the connection information from Airflow's connection manager
+    conn = BaseHook.get_connection('my_sqlserver_connection')
+    conn_str = (
+        f'DRIVER={{ODBC Driver 17 for SQL Server}};'
+        f'SERVER={conn.host};'
+        f'DATABASE={conn.schema};'
+        f'UID={conn.login};'
+        f'PWD={conn.password}'
     )
-    initialize >> mssql_select
+    
+    # Establish the connection to SQL Server
+    db_conn = pyodbc.connect(conn_str)
+    cursor = db_conn.cursor()
+    
+    # Perform database operations
+    cursor.execute("SELECT * FROM DimCustomer")
+    rows = cursor.fetchall()
+    
+    for row in rows:
+        print(row)  
+
+dag = DAG('mssql_dag',
+          default_args=default_args,
+          description='A simple DAG to interact with SQL Server',
+          schedule_interval=timedelta(days=1))
+
+t1 = PythonOperator(
+    task_id='run_mssql_callable',
+    python_callable=mssql_callable,
+    dag=dag,
+)
+
+t1
+
+    # Close the connection
+    cursor.close()
+    db_conn.close()
