@@ -27,7 +27,7 @@ def initialize_etl():
     conn.close()
    
 with DAG(
-        dag_id="connection_test_dag",
+        dag_id="my_sqlserver_connection",
         start_date=datetime(2021, 7, 1),
         schedule_interval=None,
         default_args=default_args,
