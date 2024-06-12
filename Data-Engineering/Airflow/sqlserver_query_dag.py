@@ -10,7 +10,7 @@ def execute_query():
     
     connection = pyodbc.connect(conn_str)
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM dbo.DimCustomer")
+    cursor.execute("SELECT * FROM DimCustomer")
     rows = cursor.fetchall()
     for row in rows:
         print(row)
