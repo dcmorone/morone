@@ -1,33 +1,26 @@
 from airflow import DAG
 from airflow.providers.microsoft.mssql.operators.mssql import MsSqlOperator
-from airflow.providers.microsoft.mssql.sensors.mssql import MsSqlSensor
-from datetime import datetime, timedelta
+from airflow.utils.dates import days_ago
 
+# Defina os argumentos padrão do DAG
 default_args = {
     'owner': 'airflow',
-    'depends_on_past': False,
-    'start_date': datetime(2023, 6, 26),
-    'email': ['your@email.com'],
-    'email_on_failure': True,
-    'email_on_retry': False,
-    'retries': 3,
-    'retry_delay': timedelta(minutes=5)
+    'start_date': days_ago(1),  # Ajuste conforme necessário
+    'retries': 1,
 }
 
+# Crie o DAG
 dag = DAG(
-    'sql_server_agent_dag',
+    'sqlserver_query_dag',
     default_args=default_args,
-    description='Execute SQL Server Agent jobs with Airflow',
-    schedule_interval='@daily',
+    description='Um exemplo de DAG para interagir com SQL Server',
+    schedule_interval=None,  # Ajuste conforme necessário
 )
 
-# Define the SQL Server connection details as Airflow connection variables.
-
-t1 = MsSqlOperator(
-    task_id='step_1',
-    mssql_conn_id='my_sqlserver_connection',
-    sql='SELECT *FROM dbo.DimCustomer',
+# Defina a tarefa usando MsSqlOperator
+run_sql_query = MsSqlOperator(
+    task_id='run_sql_query',
+    mssql_conn_id='my_sqlserver_connection',  # Use o id da conexão configurada
+    sql='SELECT * FROM dbo.DimCustomer;',  # Sua consulta SQL
     dag=dag,
 )
-
-t1
