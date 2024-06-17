@@ -24,4 +24,3 @@ run_sql_query = MsSqlOperator(
     sql='SELECT * FROM dbo.DimCustomer;',  # Sua consulta SQL
     dag=dag,
 )
-print(sql)
