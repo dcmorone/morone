@@ -4,7 +4,7 @@ from airflow.hooks.mysql_hook import MySqlHook
 from airflow.utils.dates import days_ago
 
 def execute_query():
-    mysql_hook = MySqlHook(mysql_conn_id='my_mysql_connection')
+    mysql_hook = MySqlHook(mysql_conn_id='my_sqlserver_connection')
     sql = "SELECT * FROM world.city LIMIT 10"
     connection = mysql_hook.get_conn()
     cursor = connection.cursor()
